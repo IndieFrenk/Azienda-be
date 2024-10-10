@@ -31,12 +31,13 @@ public class RispostaService {
 
     }
     public RispostaEntity invioRisposta(RispostaDTO rispostaDTO) throws MessagingException, IOException {
-        //pattern builder
+        //builder
         RispostaEntity risposta = new RispostaEntity();
         risposta.setContenuto(rispostaDTO.getContenuto());
         risposta.setDataSottomissione(LocalDateTime.now());
         risposta.setFeedback(feedbackDAO.findById(rispostaDTO.getFeedback_id()).get());
         risposta.setUser_id(rispostaDTO.getUser_id());
+
         risposta.setEmail(userDAO.findById(rispostaDTO.getUser_id()).get().getEmail());
         FeedbackEntity feedback = feedbackDAO.findById(rispostaDTO.getFeedback_id()).get();
         RispostaEntity newRisposta = rispostaDAO.save(risposta);

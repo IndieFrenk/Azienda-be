@@ -11,7 +11,6 @@ import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +32,7 @@ public class AuthController {
     }
     @PostConstruct
     public void initRoleAndUser() {
-        userService.initRoleAndUser();
+        //userService.initRoleAndUser();
     }
     @PostMapping("/signup")
     public ResponseEntity<UserEntity> register(@RequestBody RegisterUserDTO registerUserDto) throws Exception {

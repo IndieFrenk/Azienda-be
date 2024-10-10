@@ -8,12 +8,11 @@ import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Entity
 @Data
+
 @RequiredArgsConstructor
 public class PasswordEntity {
     @Id

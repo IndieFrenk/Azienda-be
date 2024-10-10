@@ -12,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Data
+
 @RequiredArgsConstructor
 public class UserEntity implements UserDetails {
     @Id

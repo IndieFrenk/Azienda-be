@@ -43,6 +43,7 @@ public class FeedbackService {
         feedback.setRisposte(new ArrayList<>());
         feedback.setTitolo(feedbackDTO.getTitolo());
         feedback.setUserid(userDAO.findByEmail(feedbackDTO.getEmail()).getId());
+        feedback.setStato(true);
         ContestoEntity contesto = contestoDAO.findByDefinizione(feedbackDTO.getContesti());
         List<ContestoEntity> contesti = new ArrayList<>();
         contesti.add(contesto);

@@ -70,12 +70,20 @@ public class FeedbackController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<?> cercaFeedback(@RequestBody SearchDTO searchDTO) { //data fornita dal frontend e se non fornita dall'utente inializzata a 1980
+    public ResponseEntity<?> cercaFeedback(@RequestBody SearchDTO searchDTO) {
         if(searchDTO.getData() == "") {
             searchDTO.setData( "1980-07-29T09:36:06.1728899Z");
         }
         List<FeedbackEntity> feedList = feedbackService.searchFeedback(searchDTO);
         return ResponseEntity.ok(feedList);
+    }
+    @PreAuthorize("hasRole('Admin')")
+    @PostMapping("/status/{id}")
+    public ResponseEntity<?> statusFeedback(@PathVariable long id) {
+        FeedbackEntity feedback = feedbackDAO.findById(id).get();
+        feedback.changeStatus();
+        feedbackDAO.save(feedback);
+        return ResponseEntity.ok(feedback);
     }
     @PreAuthorize("hasRole('Admin')")
     @GetMapping("/get")

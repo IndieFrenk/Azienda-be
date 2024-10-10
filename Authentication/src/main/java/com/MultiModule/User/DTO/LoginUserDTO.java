@@ -8,7 +8,7 @@ public class LoginUserDTO {
 
         private String password;
 
-        @Getter@Setter
+        @Getter @Setter
         private String resetToken;
 
         public String getEmail() {

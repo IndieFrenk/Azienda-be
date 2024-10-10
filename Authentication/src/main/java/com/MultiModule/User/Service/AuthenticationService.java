@@ -87,16 +87,19 @@ public class AuthenticationService {
         String tempPassword = generateTempPassword();
         String resetToken = generateResetToken();
         UserEntity user = new UserEntity();
-        user.setNome(input.getNome());
+
         String passEncoded = passwordEncoder.encode(tempPassword);
+
+        user.setFirstLogin(true);
+        user.setNome(input.getNome());
         user.setPassword(passEncoded);
         user.setResetPasswordToken(resetToken);
         user.setEmail(input.getEmail());
         user.setUsername(input.getUsername());
         user.setDataDiNascita(LocalDateTime.parse(input.getDataDiNascita().substring(0,input.getDataDiNascita().length()-2)));
         user.setCognome(input.getCognome());
-        user.setFirstLogin(true);
-        user.setScadenzaResetToken(LocalDateTime.now().plusHours(2));
+
+        user.setScadenzaResetToken(LocalDateTime.now().plusMinutes(15));
         Set<RoleEntity> userRoles = new HashSet<>();
         var userRole = roleRepository.findByName("User");
         userRoles.add(userRole);
@@ -130,7 +133,7 @@ public class AuthenticationService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            return userDetails.getUsername(); // or any other detail you need
+            return userDetails.getUsername();
         }
         return "No user authenticated";
     }

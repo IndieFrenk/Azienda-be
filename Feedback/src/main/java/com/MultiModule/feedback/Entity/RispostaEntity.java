@@ -16,6 +16,7 @@ public class RispostaEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    @Column(length=1500)
     private String contenuto;
 
     private long user_id;

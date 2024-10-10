@@ -13,17 +13,19 @@ import java.util.List;
 import java.util.Optional;
 
 @Entity
-@Getter
-@Setter
+@Getter @Setter
+
 @RequiredArgsConstructor
 public class FeedbackEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    @Column(length=1500)
     private String contenuto;
     private String titolo;
     private long userid;
-
+    @Column(name = "stato", nullable = false)
+    private boolean stato; //true, thread aperto, false, thread chiuso
     @JsonManagedReference
     @OneToMany(mappedBy = "feedback", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<RispostaEntity> risposte = new ArrayList<>();
@@ -44,5 +46,9 @@ public class FeedbackEntity {
     public void addRisposte(RispostaEntity risposta){
         risposte.add(risposta);
         risposta.setFeedback(this);
+    }
+    public boolean changeStatus(){
+        this.stato = !this.stato;
+        return stato;
     }
 }
