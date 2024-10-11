@@ -43,9 +43,9 @@ public class RispostaService {
         RispostaEntity newRisposta = rispostaDAO.save(risposta);
         feedback.addRisposte(newRisposta);
         feedbackDAO.save(feedback);
-
+    if (userDAO.findById(rispostaDTO.getUser_id()).get().getEmail() == "admin@mail") {
         emailService.sendAnswerEmail(feedback.getEmail(), feedback.getId());
-
+    }
         return newRisposta;
     }
     public void cancellaRisposta(long id) {rispostaDAO.deleteById(id);}
