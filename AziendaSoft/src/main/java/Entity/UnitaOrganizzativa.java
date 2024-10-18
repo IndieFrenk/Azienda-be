@@ -1,19 +1,21 @@
 package Entity;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+import lombok.Data;
 
+import java.util.List;
+
+@Data
+@Entity
 public class UnitaOrganizzativa {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
 
-    @OneToMany(mappedBy = "unitaOrganizzativa")
+    @OneToMany(mappedBy = "unitaOrganizzativa", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Ruolo> ruoli;
 
-    @OneToMany(mappedBy = "unitaOrganizzativa")
+    @OneToMany(mappedBy = "unitaOrganizzativa", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Dipendente> dipendenti;
 }
