@@ -1,4 +1,4 @@
-package DTO;
+package com.MultiModule.DTO;
 
 
 import lombok.Data;

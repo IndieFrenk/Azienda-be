@@ -1,15 +1,15 @@
-package Service;
+package com.MultiModule.Service;
 
 
-import DAO.DipendenteDAO;
-import DAO.RuoloDAO;
-import DAO.UnitaOrganizzativaDAO;
-import DTO.UnitaOrganizzativaDTO;
-import Entity.Dipendente;
-import Entity.Ruolo;
-import Entity.UnitaOrganizzativa;
-import Utility.GestioneRuoloStrategy;
-import Utility.RuoloFactory;
+import com.MultiModule.DAO.DipendenteDAO;
+import com.MultiModule.DAO.RuoloDAO;
+import com.MultiModule.DAO.UnitaOrganizzativaDAO;
+import com.MultiModule.DTO.UnitaOrganizzativaDTO;
+import com.MultiModule.Entity.Dipendente;
+import com.MultiModule.Entity.Ruolo;
+import com.MultiModule.Entity.UnitaOrganizzativa;
+import com.MultiModule.Utility.GestioneRuoloStrategy;
+import com.MultiModule.Utility.RuoloFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,18 +36,21 @@ public class UnitaOrganizzativaService {
         List<Ruolo> ruoloList =  new ArrayList<>();
         for (String i : ruoli ) { ruoloList.add(ruoloDAO.findByNome(i));}
         unitaOrganizzativa.setRuoli(ruoloList);
+
         unitaOrganizzativa.setUnitaSuperiore(unitaOrganizzativaRepository.findByNome(unitaOrganizzativaDTO.getUnitaSuperiore()));
+
         List<String> unita =  unitaOrganizzativaDTO.getUnitaSottostanti();
         List<UnitaOrganizzativa> unitaList =  new ArrayList<>();
         for (String i : unita ) { unitaList.add(unitaOrganizzativaRepository.findByNome(i));}
         unitaOrganizzativa.setUnitaSottostanti(unitaList);
+
         List<String> dipendente =  unitaOrganizzativaDTO.getRuoli();
         List<Dipendente> dipendenteList =  new ArrayList<>();
         for (String i : dipendente ) { dipendenteList.add(dipendenteDAO.findByNome(i));}
         unitaOrganizzativa.setDipendenti(dipendenteList);
         return unitaOrganizzativaRepository.save(unitaOrganizzativa);
     }
-    private UnitaOrganizzativa add
+
 
     public List<UnitaOrganizzativa> getAllUnitaOrganizzative() {
         return unitaOrganizzativaRepository.findAll();

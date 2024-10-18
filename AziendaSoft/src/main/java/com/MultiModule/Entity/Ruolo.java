@@ -1,4 +1,4 @@
-package Entity;
+package com.MultiModule.Entity;
 
 import jakarta.persistence.*;
 import lombok.Data;

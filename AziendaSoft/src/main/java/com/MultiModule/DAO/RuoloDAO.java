@@ -1,6 +1,6 @@
-package DAO;
+package com.MultiModule.DAO;
 
-import Entity.Ruolo;
+import com.MultiModule.Entity.Ruolo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

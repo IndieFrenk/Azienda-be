@@ -1,6 +1,6 @@
-package Utility;
+package com.MultiModule.Utility;
 
-import Entity.UnitaOrganizzativa;
+import com.MultiModule.Entity.UnitaOrganizzativa;
 
 public class DipendenteGestioneStrategy implements GestioneRuoloStrategy {
 

@@ -1,8 +1,8 @@
-package Utility;
+package com.MultiModule.Utility;
 
-import Entity.Dipendente;
-import Entity.Ruolo;
-import Entity.UnitaOrganizzativa;
+import com.MultiModule.Entity.Dipendente;
+import com.MultiModule.Entity.Ruolo;
+import com.MultiModule.Entity.UnitaOrganizzativa;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package Entity;
+package com.MultiModule.Entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -18,4 +18,7 @@ public class Dipendente {
             joinColumns = @JoinColumn(name = "dipendente_id"),
             inverseJoinColumns = @JoinColumn(name = "ruolo_id"))
     private List<Ruolo> ruoli;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "unita_organizzativa_id")  // Relazione con UnitaOrganizzativa
+    private UnitaOrganizzativa unitaOrganizzativa;
 }

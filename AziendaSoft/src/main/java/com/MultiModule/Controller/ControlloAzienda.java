@@ -1,9 +1,9 @@
-package Controller;
+package com.MultiModule.Controller;
 
 
-import DTO.UnitaOrganizzativaDTO;
-import Entity.UnitaOrganizzativa;
-import Service.UnitaOrganizzativaService;
+import com.MultiModule.DTO.UnitaOrganizzativaDTO;
+import com.MultiModule.Entity.UnitaOrganizzativa;
+import com.MultiModule.Service.UnitaOrganizzativaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/unita-organizzative")
+@RequestMapping("/api/unita")
 public class ControlloAzienda {
 
     @Autowired
@@ -52,4 +52,6 @@ public class ControlloAzienda {
         unitaOrganizzativaService.deleteUnitaOrganizzativa(id);
         return ResponseEntity.ok().build();
     }
+    //creazione dipendenti
+    //creazione ruolo
 }

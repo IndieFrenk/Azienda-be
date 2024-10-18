@@ -1,6 +1,6 @@
-package DAO;
+package com.MultiModule.DAO;
 
-import Entity.Dipendente;
+import com.MultiModule.Entity.Dipendente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

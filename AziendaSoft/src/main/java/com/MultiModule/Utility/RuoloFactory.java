@@ -1,6 +1,6 @@
-package Utility;
+package com.MultiModule.Utility;
 
-import Entity.Ruolo;
+import com.MultiModule.Entity.Ruolo;
 
 public class RuoloFactory {
     public static Ruolo createRuolo(String tipoRuolo) {
