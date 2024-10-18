@@ -1,8 +1,11 @@
 package Service;
 
 
+import DAO.DipendenteDAO;
 import DAO.RuoloDAO;
 import DAO.UnitaOrganizzativaDAO;
+import DTO.UnitaOrganizzativaDTO;
+import Entity.Dipendente;
 import Entity.Ruolo;
 import Entity.UnitaOrganizzativa;
 import Utility.GestioneRuoloStrategy;
@@ -10,8 +13,10 @@ import Utility.RuoloFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UnitaOrganizzativaService {
@@ -20,10 +25,29 @@ public class UnitaOrganizzativaService {
     private GestioneRuoloStrategy gestioneRuoloStrategy;
     @Autowired
     private RuoloDAO ruoloDAO;
+    @Autowired
+    private DipendenteDAO dipendenteDAO;
 
-    public UnitaOrganizzativa createUnitaOrganizzativa(UnitaOrganizzativa unitaOrganizzativa) {
+    public UnitaOrganizzativa createUnitaOrganizzativa(UnitaOrganizzativaDTO unitaOrganizzativaDTO) {
+        UnitaOrganizzativa unitaOrganizzativa = new UnitaOrganizzativa();
+        unitaOrganizzativa.setNome(unitaOrganizzativaDTO.getNome());
+        //metodo per sistemarli
+        List<String> ruoli =  unitaOrganizzativaDTO.getRuoli();
+        List<Ruolo> ruoloList =  new ArrayList<>();
+        for (String i : ruoli ) { ruoloList.add(ruoloDAO.findByNome(i));}
+        unitaOrganizzativa.setRuoli(ruoloList);
+        unitaOrganizzativa.setUnitaSuperiore(unitaOrganizzativaRepository.findByNome(unitaOrganizzativaDTO.getUnitaSuperiore()));
+        List<String> unita =  unitaOrganizzativaDTO.getUnitaSottostanti();
+        List<UnitaOrganizzativa> unitaList =  new ArrayList<>();
+        for (String i : unita ) { unitaList.add(unitaOrganizzativaRepository.findByNome(i));}
+        unitaOrganizzativa.setUnitaSottostanti(unitaList);
+        List<String> dipendente =  unitaOrganizzativaDTO.getRuoli();
+        List<Dipendente> dipendenteList =  new ArrayList<>();
+        for (String i : dipendente ) { dipendenteList.add(dipendenteDAO.findByNome(i));}
+        unitaOrganizzativa.setDipendenti(dipendenteList);
         return unitaOrganizzativaRepository.save(unitaOrganizzativa);
     }
+    private UnitaOrganizzativa add
 
     public List<UnitaOrganizzativa> getAllUnitaOrganizzative() {
         return unitaOrganizzativaRepository.findAll();
@@ -32,7 +56,25 @@ public class UnitaOrganizzativaService {
     public Optional<UnitaOrganizzativa> getUnitaOrganizzativaById(Long id) {
         return unitaOrganizzativaRepository.findById(id);
     }
+    public UnitaOrganizzativaDTO convertToDTO(UnitaOrganizzativa unita) {
+        UnitaOrganizzativaDTO dto = new UnitaOrganizzativaDTO();
+        dto.setId(unita.getId());
+        dto.setNome(unita.getNome());
 
+        // Converti i ruoli in una lista di stringhe (nomi dei ruoli)
+        List<String> ruoli = unita.getRuoli().stream()
+                .map(Ruolo::getNome)
+                .collect(Collectors.toList());
+        dto.setRuoli(ruoli);
+
+        // Converti i dipendenti in una lista di stringhe (nomi dei dipendenti)
+        List<String> dipendenti = unita.getDipendenti().stream()
+                .map(Dipendente::getNome)
+                .collect(Collectors.toList());
+        dto.setDipendenti(dipendenti);
+
+        return dto;
+    }
     public UnitaOrganizzativa updateUnitaOrganizzativa(Long id, UnitaOrganizzativa unitaOrganizzativa) {
         Optional<UnitaOrganizzativa> unitaEsistente = unitaOrganizzativaRepository.findById(id);
         if (unitaEsistente.isPresent()) {

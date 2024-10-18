@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UnitaOrganizzativaDAO extends JpaRepository<UnitaOrganizzativa, Long> {
-
+    UnitaOrganizzativa findByNome(String nome);
 }

@@ -1,6 +1,7 @@
 package Controller;
 
 
+import DTO.UnitaOrganizzativaDTO;
 import Entity.UnitaOrganizzativa;
 import Service.UnitaOrganizzativaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,22 +9,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/control")
+@RequestMapping("/api/unita-organizzative")
 public class ControlloAzienda {
 
     @Autowired
     private UnitaOrganizzativaService unitaOrganizzativaService;
 
     @GetMapping
-    public ResponseEntity<List<UnitaOrganizzativa>> getAllUnitaOrganizzative() {
-        return ResponseEntity.ok(unitaOrganizzativaService.getAllUnitaOrganizzative());
+    public ResponseEntity<List<UnitaOrganizzativaDTO>> getAllUnitaOrganizzative() {
+        List<UnitaOrganizzativa> unitaOrganizzative = unitaOrganizzativaService.getAllUnitaOrganizzative();
+        List<UnitaOrganizzativaDTO> dtos = unitaOrganizzative.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+    private UnitaOrganizzativaDTO convertToDTO(UnitaOrganizzativa unita) {
+       return unitaOrganizzativaService.convertToDTO(unita);
     }
 
     @PostMapping
-    public ResponseEntity<UnitaOrganizzativa> createUnitaOrganizzativa(@RequestBody UnitaOrganizzativa unitaOrganizzativa) {
-        return ResponseEntity.ok(unitaOrganizzativaService.createUnitaOrganizzativa(unitaOrganizzativa));
+    public ResponseEntity<UnitaOrganizzativa> createUnitaOrganizzativa(@RequestBody UnitaOrganizzativaDTO unitaOrganizzativaDTO) {
+        return ResponseEntity.ok(unitaOrganizzativaService.createUnitaOrganizzativa(unitaOrganizzativaDTO));
     }
 
     @GetMapping("/{id}")

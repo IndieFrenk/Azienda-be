@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DipendenteDAO extends JpaRepository<Dipendente, Long> {
+    Dipendente findByNome(String nome);
 }

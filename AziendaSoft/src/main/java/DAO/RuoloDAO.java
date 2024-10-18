@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RuoloDAO extends JpaRepository<Ruolo, Long> {
+    Ruolo findByNome(String nome);
 }
