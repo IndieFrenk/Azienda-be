@@ -151,6 +151,7 @@
 		<module>Feedback</module>
 		<module>Authentication</module>
 		<module>AppMain</module>
+		<module>AziendaSoft</module>
 	</modules>
 	<build>
 		<defaultGoal>install</defaultGoal>

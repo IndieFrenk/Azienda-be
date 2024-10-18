@@ -28,6 +28,12 @@
         </dependency>
         <dependency>
             <groupId>com.MultiModule</groupId>
+            <artifactId>AziendaSoft</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.MultiModule</groupId>
             <artifactId>Configuration</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
