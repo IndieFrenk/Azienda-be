@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 public class UnitaOrganizzativa {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String nome;
 
@@ -25,7 +25,7 @@ public class UnitaOrganizzativa {
     @OneToMany(mappedBy = "unitaOrganizzativa", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Ruolo> ruoli;
 
-    @OneToMany(mappedBy = "unitaOrganizzativa", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "unitaOrganizzative")
     private List<Dipendente> dipendenti;
 
 }

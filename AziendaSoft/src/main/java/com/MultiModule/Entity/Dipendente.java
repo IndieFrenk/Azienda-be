@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 public class Dipendente {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String nome;
 
@@ -18,7 +18,12 @@ public class Dipendente {
             joinColumns = @JoinColumn(name = "dipendente_id"),
             inverseJoinColumns = @JoinColumn(name = "ruolo_id"))
     private List<Ruolo> ruoli;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "unita_organizzativa_id")  // Relazione con UnitaOrganizzativa
-    private UnitaOrganizzativa unitaOrganizzativa;
+
+    @ManyToMany
+    @JoinTable(
+            name = "unita_dipendenti",
+            joinColumns = @JoinColumn(name = "dipendente_id"),
+            inverseJoinColumns = @JoinColumn(name = "unita_organizzativa_id")
+    )
+    private List<UnitaOrganizzativa> unitaOrganizzative;
 }
