@@ -252,4 +252,8 @@ public class UnitaOrganizzativaService {
             throw new IllegalArgumentException("Ruolo o dipendente non trovati.");
         }
     }
+
+    public List<Ruolo> getRuoli() {
+        return ruoloDAO.findAll();
+    }
 }

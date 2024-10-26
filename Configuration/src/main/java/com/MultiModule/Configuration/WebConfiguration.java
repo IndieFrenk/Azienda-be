@@ -35,7 +35,7 @@ public class WebConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()).cors( cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((auth) -> { auth
-                        .requestMatchers("/auth/**","/feedback/**")
+                        .requestMatchers("/auth/**","/feedback/**","/azienda/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 ;})
