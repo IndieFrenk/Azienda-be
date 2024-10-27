@@ -4,6 +4,7 @@ package com.MultiModule.Service;
 import com.MultiModule.DAO.DipendenteDAO;
 import com.MultiModule.DAO.RuoloDAO;
 import com.MultiModule.DAO.UnitaOrganizzativaDAO;
+import com.MultiModule.DTO.DipendenteDTO;
 import com.MultiModule.DTO.UnitaOrganizzativaDTO;
 import com.MultiModule.Entity.Dipendente;
 import com.MultiModule.Entity.Ruolo;
@@ -13,9 +14,7 @@ import com.MultiModule.Utility.RuoloFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +28,11 @@ public class UnitaOrganizzativaService {
     private DipendenteDAO dipendenteDAO;
 
     public UnitaOrganizzativa createUnitaOrganizzativa(UnitaOrganizzativaDTO unitaOrganizzativaDTO) {
+        System.out.println(unitaOrganizzativaDTO.getUnitaSuperiore());
+
+        if (unitaOrganizzativaRepository.findByNome(unitaOrganizzativaDTO.getNome()) != null) {
+            return null;
+        }
         UnitaOrganizzativa unitaOrganizzativa = new UnitaOrganizzativa();
         unitaOrganizzativa.setNome(unitaOrganizzativaDTO.getNome());
         //metodo per sistemarli
@@ -37,14 +41,14 @@ public class UnitaOrganizzativaService {
         for (String i : ruoli ) { ruoloList.add(ruoloDAO.findByNome(i));}
         unitaOrganizzativa.setRuoli(ruoloList);
 
-        unitaOrganizzativa.setUnitaSuperiore(unitaOrganizzativaRepository.findByNome(unitaOrganizzativaDTO.getUnitaSuperiore()));
-
+        Optional<UnitaOrganizzativa> unitaSuperiore = unitaOrganizzativaRepository.findById(Long.valueOf(unitaOrganizzativaDTO.getUnitaSuperiore()));
+        unitaOrganizzativa.setUnitaSuperiore(unitaSuperiore.get());
         List<String> unita =  unitaOrganizzativaDTO.getUnitaSottostanti();
         List<UnitaOrganizzativa> unitaList =  new ArrayList<>();
         for (String i : unita ) { unitaList.add(unitaOrganizzativaRepository.findByNome(i));}
         unitaOrganizzativa.setUnitaSottostanti(unitaList);
 
-        List<String> dipendente =  unitaOrganizzativaDTO.getRuoli();
+        List<String> dipendente =  unitaOrganizzativaDTO.getDipendenti();
         List<Dipendente> dipendenteList =  new ArrayList<>();
         for (String i : dipendente ) { dipendenteList.add(dipendenteDAO.findByNome(i));}
         unitaOrganizzativa.setDipendenti(dipendenteList);
@@ -80,17 +84,32 @@ public class UnitaOrganizzativaService {
         return dto;
     }
 
-    public UnitaOrganizzativa updateUnitaOrganizzativa(Long id, UnitaOrganizzativa unitaOrganizzativa) {
+    public UnitaOrganizzativa updateUnitaOrganizzativa(Long id, UnitaOrganizzativaDTO unitaOrganizzativaDTO) {
         Optional<UnitaOrganizzativa> unitaEsistente = unitaOrganizzativaRepository.findById(id);
         if (unitaEsistente.isPresent()) {
             UnitaOrganizzativa unitaAggiornata = unitaEsistente.get();
-            unitaAggiornata.setNome(unitaOrganizzativa.getNome());
-            unitaAggiornata.setRuoli(unitaOrganizzativa.getRuoli());
-            unitaAggiornata.setDipendenti(unitaOrganizzativa.getDipendenti());
+            unitaAggiornata.setNome(unitaOrganizzativaDTO.getNome());
+            unitaAggiornata.setRuoli(this.getRuoli(unitaOrganizzativaDTO.getRuoli()));
+            unitaAggiornata.setDipendenti(this.getDipendenti(unitaOrganizzativaDTO.getDipendenti()));
+            unitaAggiornata.setUnitaSuperiore(unitaOrganizzativaRepository.findByNome(unitaOrganizzativaDTO.getUnitaSuperiore()));
             return unitaOrganizzativaRepository.save(unitaAggiornata);
         } else {
             throw new IllegalArgumentException("Unità organizzativa non trovata.");
         }
+    }
+    private List<Ruolo> getRuoli(List<String> ruoli) {
+        List<Ruolo> ruoloList =  new ArrayList<>();
+        for (String  i : ruoli) {
+            ruoloList.add(ruoloDAO.findByNome(i));
+        }
+        return ruoloList;
+    }
+    private List<Dipendente> getDipendenti(List<String> dipendenti) {
+        List<Dipendente> dipendenteList =  new ArrayList<>();
+        for (String  i : dipendenti) {
+            dipendenteList.add(dipendenteDAO.findByNome(i));
+        }
+        return dipendenteList;
     }
 
     public void deleteUnitaOrganizzativa(Long id) {
@@ -98,9 +117,13 @@ public class UnitaOrganizzativaService {
     }
 
     public Ruolo createRuoloPerUnita(String tipoRuolo, UnitaOrganizzativa unitaOrganizzativa) {
-        Ruolo nuovoRuolo = RuoloFactory.createRuolo(tipoRuolo, unitaOrganizzativa);
-        nuovoRuolo.setUnitaOrganizzativa(unitaOrganizzativa);
-        return ruoloDAO.save(nuovoRuolo);
+        Ruolo ruolo = new Ruolo();
+        ruolo.setNome(tipoRuolo);
+        List<UnitaOrganizzativa> unita= new ArrayList<>();
+        unita.add(unitaOrganizzativa);
+
+        ruolo.setUnitaOrganizzative(unita);
+        return ruoloDAO.save(ruolo);
     }
 
     public void setGestioneRuoloStrategy(GestioneRuoloStrategy gestioneRuoloStrategy) {
@@ -166,11 +189,21 @@ public class UnitaOrganizzativaService {
         }
     }
 
-    public List<Dipendente> getDipendentiUnita(Long unitaId) {
+    public List<Dipendente> getDipendentiUnita(Long unitaId, Long ruoloId) {
         Optional<UnitaOrganizzativa> unitaOpt = unitaOrganizzativaRepository.findById(unitaId);
-
         if (unitaOpt.isPresent()) {
-            return unitaOpt.get().getDipendenti();
+            UnitaOrganizzativa unita = unitaOpt.get();
+
+            // Mappa per associare i nomi dei ruoli con i nomi dei dipendenti
+            List<Dipendente> ruoloDipendenti = new ArrayList<>() ;
+
+            // Iterare attraverso ogni ruolo dell'unità
+            for (Dipendente dipendente : unita.getDipendenti()) {
+               if (dipendente.getRuoli().contains(ruoloDAO.findById(ruoloId).get())) {
+                   ruoloDipendenti.add(dipendente);
+               }
+            }
+            return ruoloDipendenti;
         } else {
             throw new IllegalArgumentException("Unità organizzativa non trovata.");
         }
@@ -180,10 +213,17 @@ public class UnitaOrganizzativaService {
     // 1. Aggiungi un ruolo a una unità organizzativa
     public Ruolo aggiungiRuolo(Long unitaId, String nomeRuolo) {
         Optional<UnitaOrganizzativa> unitaOpt = unitaOrganizzativaRepository.findById(unitaId);
-
+        Optional<Ruolo> ruolo = Optional.ofNullable(ruoloDAO.findByNome(nomeRuolo));
         if (unitaOpt.isPresent()) {
             UnitaOrganizzativa unita = unitaOpt.get();
-            Ruolo nuovoRuolo = new Ruolo(nomeRuolo, unita);  // Crea il nuovo ruolo connesso all'unità organizzativa
+
+            if (ruolo.isPresent()){
+                ruolo.get().getUnitaOrganizzative().add(unita);
+                return ruoloDAO.save(ruolo.get());
+            }
+            List<UnitaOrganizzativa> listUnita = new ArrayList<>();
+            listUnita.add(unita);
+            Ruolo nuovoRuolo = new Ruolo(nomeRuolo, listUnita);  // Crea il nuovo ruolo connesso all'unità organizzativa
             return ruoloDAO.save(nuovoRuolo);  // Salva il ruolo nel repository
         } else {
             throw new IllegalArgumentException("Unità organizzativa non trovata.");
@@ -199,8 +239,15 @@ public class UnitaOrganizzativaService {
             Ruolo ruolo = ruoloOpt.get();
             UnitaOrganizzativa unita = unitaOpt.get();
 
-            if (ruolo.getUnitaOrganizzativa().equals(unita)) {
-                ruoloDAO.delete(ruolo);  // Elimina il ruolo solo se appartiene a questa unità
+            // Check if the role is indeed associated with the unit
+            if (ruolo.getUnitaOrganizzative().contains(unita)) {
+                // Remove the relationship
+                ruolo.getUnitaOrganizzative().remove(unita);
+                unita.getRuoli().remove(ruolo);
+
+                // Save both entities to update the relationship in the database
+                ruoloDAO.save(ruolo);
+                unitaOrganizzativaRepository.save(unita);
             } else {
                 throw new IllegalArgumentException("Il ruolo non appartiene all'unità specificata.");
             }
@@ -208,7 +255,109 @@ public class UnitaOrganizzativaService {
             throw new IllegalArgumentException("Unità organizzativa o ruolo non trovati.");
         }
     }
+    public Dipendente creaDipendenteConRuoliEUnita(DipendenteDTO dipendenteDTO) {
+        List<Long> ruoliIds = dipendenteDTO.getRuoli();
+        Long unitaId = dipendenteDTO.getUnita();
+        System.out.println(dipendenteDTO.getUnita());
+        System.out.println(dipendenteDTO.getRuoli());
+        List<Ruolo> ruoli = new ArrayList<>();
+        if (ruoliIds != null && !ruoliIds.isEmpty()) {
+            ruoli = ruoloDAO.findAllById(ruoliIds);
+        }
 
+        UnitaOrganizzativa unita = null;
+        if (unitaId != null) {
+            Optional<UnitaOrganizzativa> unitaOpt = unitaOrganizzativaRepository.findById(unitaId);
+            unita = unitaOpt.orElse(null);
+        }
+
+        // Creare e inizializzare il dipendente con i dati dal DTO
+        Dipendente dipendente = new Dipendente();
+        dipendente.setNome(dipendenteDTO.getNome());
+        dipendente.setRuoli(new ArrayList<>());
+        dipendente.setUnitaOrganizzative(new ArrayList<>());
+
+        // Aggiungere i ruoli recuperati
+        if (!ruoli.isEmpty()) {
+            dipendente.getRuoli().addAll(ruoli);
+        }
+
+        // Aggiungere l'unità recuperata
+        if (unita != null) {
+            dipendente.getUnitaOrganizzative().add(unita);
+        }
+        // Gestire i ruoli
+        if (ruoliIds != null && !ruoliIds.isEmpty()) {
+            for (Long ruoloId : ruoliIds) {
+                Optional<Ruolo> ruoloOpt = ruoloDAO.findById(ruoloId);
+                if (ruoloOpt.isPresent()) {
+                    Ruolo ruolo = ruoloOpt.get();
+
+                    // Aggiungere il ruolo al dipendente
+                    dipendente.getRuoli().add(ruolo);
+
+                    // Aggiungere il dipendente al ruolo
+                    if (ruolo.getDipendenti() == null) {
+                        ruolo.setDipendenti(new ArrayList<>());
+                    }
+                    ruolo.getDipendenti().add(dipendente);
+
+                    // Per ogni unità organizzativa associata al ruolo
+                    if (ruolo.getUnitaOrganizzative() != null) {
+                        for (UnitaOrganizzativa unitaRuolo : ruolo.getUnitaOrganizzative()) {
+                            // Aggiungere il ruolo all'unità se non è già presente
+                            if (!unitaRuolo.getRuoli().contains(ruolo)) {
+                                unitaRuolo.getRuoli().add(ruolo);
+                            }
+                            // Salvare l'unità organizzativa aggiornata
+                            unitaOrganizzativaRepository.save(unitaRuolo);
+                        }
+                    }
+
+                    // Salvare il ruolo aggiornato
+                    ruoloDAO.save(ruolo);
+                }
+            }
+        }
+
+        // Gestire l'unità organizzativa
+        if (unitaId != null) {
+            Optional<UnitaOrganizzativa> unitaOpt = unitaOrganizzativaRepository.findById(unitaId);
+            if (unitaOpt.isPresent()) {
+                 unita = unitaOpt.get();
+
+                // Aggiungere l'unità al dipendente
+                if (!dipendente.getUnitaOrganizzative().contains(unita)) {
+                    dipendente.getUnitaOrganizzative().add(unita);
+                }
+
+                // Aggiungere il dipendente all'unità
+                if (unita.getDipendenti() == null) {
+                    unita.setDipendenti(new ArrayList<>());
+                }
+                if (!unita.getDipendenti().contains(dipendente)) {
+                    unita.getDipendenti().add(dipendente);
+                }
+
+                // Gestire la relazione con i ruoli dell'unità
+                if (unita.getRuoli() != null) {
+                    for (Ruolo ruoloUnita : unita.getRuoli()) {
+                        // Aggiungere l'unità al ruolo se non è già presente
+                        if (!ruoloUnita.getUnitaOrganizzative().contains(unita)) {
+                            ruoloUnita.getUnitaOrganizzative().add(unita);
+                            ruoloDAO.save(ruoloUnita);
+                        }
+                    }
+                }
+
+                // Salvare l'unità organizzativa aggiornata
+                unitaOrganizzativaRepository.save(unita);
+            }
+        }
+
+        // Salvare e ritornare il dipendente finale
+        return dipendenteDAO.save(dipendente);
+    }
     // 3. Aggiorna un ruolo esistente
     public Ruolo aggiornaRuolo(Long ruoloId, String nuovoNome) {
         Optional<Ruolo> ruoloOpt = ruoloDAO.findById(ruoloId);
@@ -256,4 +405,13 @@ public class UnitaOrganizzativaService {
     public List<Ruolo> getRuoli() {
         return ruoloDAO.findAll();
     }
+
+    /*public Dipendente creaDipendente(DipendenteDTO dipendente) {
+        Dipendente dipendente1 = new Dipendente();
+        dipendente1.setNome(dipendente.getNome());
+        dipendente1.setRuoli(dipendente.getRuoli());
+        dipendente1.setUnitaOrganizzative(dipendente.getUnitaOrganizzative());
+        dipendenteDAO.save(dipendente1);
+        return dipendente1;
+    }*/
 }

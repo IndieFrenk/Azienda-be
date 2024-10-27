@@ -3,11 +3,13 @@ package com.MultiModule.Utility;
 import com.MultiModule.Entity.Ruolo;
 import com.MultiModule.Entity.UnitaOrganizzativa;
 
+import java.util.List;
+
 public class RuoloFactory {
 
-    public static Ruolo createRuolo(String tipoRuolo, UnitaOrganizzativa unitaOrganizzativa) {
+    public static Ruolo createRuolo(String tipoRuolo, List<UnitaOrganizzativa> unitaOrganizzativa) {
         Ruolo ruolo = new Ruolo();
-        ruolo.setUnitaOrganizzativa(unitaOrganizzativa);  // Associa il ruolo all'unità organizzativa
+        ruolo.setUnitaOrganizzative(unitaOrganizzativa);  // Associa il ruolo all'unità organizzativa
 
         switch (tipoRuolo) {
             case "Manager":

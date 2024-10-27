@@ -1,5 +1,6 @@
 package com.MultiModule.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -14,12 +15,14 @@ public class Dipendente {
     private String nome;
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(name = "dipendente_ruolo",
             joinColumns = @JoinColumn(name = "dipendente_id"),
             inverseJoinColumns = @JoinColumn(name = "ruolo_id"))
     private List<Ruolo> ruoli;
 
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "unita_dipendenti",
             joinColumns = @JoinColumn(name = "dipendente_id"),

@@ -1,6 +1,8 @@
 package com.MultiModule.Controller;
 
 
+import com.MultiModule.DAO.RuoloDAO;
+import com.MultiModule.DTO.DipendenteDTO;
 import com.MultiModule.DTO.RuoloDTO;
 import com.MultiModule.DTO.UnitaOrganizzativaDTO;
 import com.MultiModule.Entity.Dipendente;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -21,6 +24,8 @@ public class ControlloAzienda {
 
     @Autowired
     private UnitaOrganizzativaService unitaOrganizzativaService;
+    @Autowired
+    private RuoloDAO ruoloDAO;
 
     @GetMapping
     public ResponseEntity<List<UnitaOrganizzativaDTO>> getAllUnitaOrganizzative() {
@@ -48,8 +53,8 @@ public class ControlloAzienda {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UnitaOrganizzativa> updateUnitaOrganizzativa(@PathVariable Long id, @RequestBody UnitaOrganizzativa unitaOrganizzativa) {
-        return ResponseEntity.ok(unitaOrganizzativaService.updateUnitaOrganizzativa(id, unitaOrganizzativa));
+    public ResponseEntity<UnitaOrganizzativa> updateUnitaOrganizzativa(@PathVariable Long id, @RequestBody UnitaOrganizzativaDTO unitaOrganizzativaDTO) {
+        return ResponseEntity.ok(unitaOrganizzativaService.updateUnitaOrganizzativa(id, unitaOrganizzativaDTO));
     }
 
     @DeleteMapping("/{id}")
@@ -58,7 +63,20 @@ public class ControlloAzienda {
         return ResponseEntity.ok().build();
     }
 
+
+
+
     // Dipendenti management endpoints
+   /* @PostMapping("/dipendenti/create")
+    public ResponseEntity<Dipendente> aggiungiDipendente(@RequestBody DipendenteDTO dipendente) {
+        return ResponseEntity.ok(unitaOrganizzativaService.creaDipendente(dipendente));
+    }*/
+
+    @PostMapping("/dipendenti/create-with-roles-and-unit")
+    public ResponseEntity<Dipendente> creaDipendenteConRuoliEUnita(@RequestBody DipendenteDTO dipendenteDTO) {
+        Dipendente dipendente = unitaOrganizzativaService.creaDipendenteConRuoliEUnita(dipendenteDTO);
+        return ResponseEntity.ok(dipendente);
+    }
     @PostMapping("/dipendenti/{unitaId}/{dipendenteId}")
     public ResponseEntity<UnitaOrganizzativa> aggiungiDipendente(@PathVariable Long unitaId, @PathVariable Long dipendenteId) {
         return ResponseEntity.ok(unitaOrganizzativaService.aggiungiDipendente(unitaId, dipendenteId));
@@ -76,10 +94,11 @@ public class ControlloAzienda {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{unitaId}/dipendenti")
-    public ResponseEntity<List<Dipendente>> getDipendentiUnita(@PathVariable Long unitaId) {
-        return ResponseEntity.ok(unitaOrganizzativaService.getDipendentiUnita(unitaId));
+    @GetMapping("/{unitaId}/{ruoloId/dipendenti")
+    public ResponseEntity<List<Dipendente>> getDipendentiUnita(@PathVariable Long unitaId, @PathVariable Long ruoloId) {
+        return ResponseEntity.ok(unitaOrganizzativaService.getDipendentiUnita(unitaId, ruoloId));
     }
+
 
     // Ruoli management endpoints
     @PostMapping("/{unitaId}/ruoli")
@@ -125,4 +144,13 @@ public class ControlloAzienda {
         }
         return ResponseEntity.notFound().build();
     }
+    //crea ruolo
+    @PostMapping("/ruoli/create")
+    public ResponseEntity<Ruolo> createRuoloPerUnita(@RequestBody RuoloDTO ruolo) {
+        Ruolo ruolo1 = new Ruolo();
+        ruolo1.setNome(ruolo.getNome());
+        ruoloDAO.save(ruolo1);
+        return ResponseEntity.ok(ruolo1);
+    }
+
 }
