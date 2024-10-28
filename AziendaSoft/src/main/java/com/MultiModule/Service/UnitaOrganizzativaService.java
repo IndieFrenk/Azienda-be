@@ -10,6 +10,7 @@ import com.MultiModule.Entity.Dipendente;
 import com.MultiModule.Entity.Ruolo;
 import com.MultiModule.Entity.UnitaOrganizzativa;
 import com.MultiModule.Utility.GestioneRuoloStrategy;
+import jakarta.persistence.EntityNotFoundException;
 import org.elasticsearch.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -187,10 +188,15 @@ public class UnitaOrganizzativaService {
         if (unitaOpt.isPresent() && dipendenteOpt.isPresent()) {
             UnitaOrganizzativa unita = unitaOpt.get();
             Dipendente dipendente = dipendenteOpt.get();
-            unita.getDipendenti().remove(dipendente);  // Rimuovi il dipendente dalla lista
-            return unitaOrganizzativaRepository.save(unita);  // Salva l'unità organizzativa aggiornata
+
+            // Rimuovi il dipendente dalla lista di dipendenti nell'unità organizzativa
+            unita.getDipendenti().remove(dipendente);
+            dipendente.getUnitaOrganizzative().remove(unita);
+
+            // Salva l'unità organizzativa aggiornata
+            return unitaOrganizzativaRepository.save(unita);
         } else {
-            throw new IllegalArgumentException("Unità organizzativa o dipendente non trovati.");
+            throw new EntityNotFoundException("Unità organizzativa o dipendente non trovati.");
         }
     }
 
