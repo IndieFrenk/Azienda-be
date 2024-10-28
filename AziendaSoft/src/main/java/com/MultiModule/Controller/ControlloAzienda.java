@@ -66,7 +66,7 @@ public class ControlloAzienda {
 
 
 
-    // Dipendenti management endpoints
+
    @GetMapping("/dipendenti")
     public ResponseEntity<List<Dipendente>> getDipendenti() {
         return ResponseEntity.ok(unitaOrganizzativaService.getAllDipendenti());
@@ -103,7 +103,7 @@ public class ControlloAzienda {
     }
 
 
-    // Ruoli management endpoints
+
     @PostMapping("/{unitaId}/ruoli")
     public ResponseEntity<Ruolo> aggiungiRuolo(@PathVariable Long unitaId, @RequestBody String nomeRuolo) {
         return ResponseEntity.ok(unitaOrganizzativaService.aggiungiRuolo(unitaId, nomeRuolo));
@@ -147,7 +147,7 @@ public class ControlloAzienda {
         }
         return ResponseEntity.notFound().build();
     }
-    //crea ruolo
+
     @PostMapping("/ruoli/create")
     public ResponseEntity<Ruolo> createRuoloPerUnita(@RequestBody RuoloDTO ruolo) {
         Ruolo ruolo1 = new Ruolo();

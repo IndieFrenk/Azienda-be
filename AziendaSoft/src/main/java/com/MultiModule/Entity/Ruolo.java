@@ -16,7 +16,7 @@ public class Ruolo {
     private Long id;
     private String nome;
 
-    // Relazione molti-a-uno con UnitaOrganizzativa
+
     @ManyToMany
     @JsonManagedReference
     @JoinTable(
@@ -26,7 +26,7 @@ public class Ruolo {
     )
     private Set<UnitaOrganizzativa> unitaOrganizzative = new HashSet<>();
 
-    // Relazione molti-a-molti con Dipendente
+
     @ManyToMany(mappedBy = "ruoli")
     private List<Dipendente> dipendenti;
 

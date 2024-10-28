@@ -19,11 +19,11 @@ public class UnitaOrganizzativa {
 
     @ManyToOne
     @Nullable
-    @JoinColumn(name = "unita_superiore_id")  // Foreign key che rappresenta l'unità padre
+    @JoinColumn(name = "unita_superiore_id")
     @JsonManagedReference
     private UnitaOrganizzativa unitaSuperiore;
 
-    // Relazione uno-a-molti: Un'unità organizzativa può avere più unità figlie
+
     @OneToMany(mappedBy = "unitaSuperiore", cascade = CascadeType.ALL)
     @JsonBackReference
     private List<UnitaOrganizzativa> unitaSottostanti;
