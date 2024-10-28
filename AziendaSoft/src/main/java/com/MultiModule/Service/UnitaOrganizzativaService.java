@@ -119,7 +119,9 @@ public class UnitaOrganizzativaService {
     public ResponseEntity<Object> deleteUnitaOrganizzativa(Long id) {
         UnitaOrganizzativa unitaOrganizzativa = unitaOrganizzativaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Unità organizzativa non trovata"));
-
+        if(unitaOrganizzativa.getUnitaSottostanti().size() > 0){
+            return ResponseEntity.badRequest().body("Non puoi eliminare un'unità organizzativa con unità sottostanti");
+        }
         List<Ruolo> ruoli = unitaOrganizzativa.getRuoli();
         for (Ruolo ruolo : ruoli) {
             ruolo.getUnitaOrganizzative().remove(unitaOrganizzativa);
