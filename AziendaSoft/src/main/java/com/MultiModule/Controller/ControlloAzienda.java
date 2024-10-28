@@ -94,7 +94,7 @@ public class ControlloAzienda {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{unitaId}/{ruoloId/dipendenti")
+    @GetMapping("/{unitaId}/{ruoloId}/dipendenti")
     public ResponseEntity<List<Dipendente>> getDipendentiUnita(@PathVariable Long unitaId, @PathVariable Long ruoloId) {
         return ResponseEntity.ok(unitaOrganizzativaService.getDipendentiUnita(unitaId, ruoloId));
     }
