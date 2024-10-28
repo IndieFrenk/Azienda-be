@@ -2,6 +2,7 @@ package com.MultiModule.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -17,6 +18,7 @@ public class UnitaOrganizzativa {
     private String nome;
 
     @ManyToOne
+    @Nullable
     @JoinColumn(name = "unita_superiore_id")  // Foreign key che rappresenta l'unità padre
     @JsonManagedReference
     private UnitaOrganizzativa unitaSuperiore;

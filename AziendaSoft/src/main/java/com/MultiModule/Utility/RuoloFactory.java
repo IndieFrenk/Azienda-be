@@ -4,10 +4,11 @@ import com.MultiModule.Entity.Ruolo;
 import com.MultiModule.Entity.UnitaOrganizzativa;
 
 import java.util.List;
+import java.util.Set;
 
 public class RuoloFactory {
 
-    public static Ruolo createRuolo(String tipoRuolo, List<UnitaOrganizzativa> unitaOrganizzativa) {
+    public static Ruolo createRuolo(String tipoRuolo, Set<UnitaOrganizzativa> unitaOrganizzativa) {
         Ruolo ruolo = new Ruolo();
         ruolo.setUnitaOrganizzative(unitaOrganizzativa);  // Associa il ruolo all'unità organizzativa
 

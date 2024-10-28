@@ -67,11 +67,14 @@ public class ControlloAzienda {
 
 
     // Dipendenti management endpoints
-   /* @PostMapping("/dipendenti/create")
-    public ResponseEntity<Dipendente> aggiungiDipendente(@RequestBody DipendenteDTO dipendente) {
-        return ResponseEntity.ok(unitaOrganizzativaService.creaDipendente(dipendente));
-    }*/
-
+   @GetMapping("/dipendenti")
+    public ResponseEntity<List<Dipendente>> getDipendenti() {
+        return ResponseEntity.ok(unitaOrganizzativaService.getAllDipendenti());
+    }
+    @GetMapping("/{unitaId}/dipendenti")
+    public ResponseEntity<List<Dipendente>>  getDipendentiNonAssegnati(@PathVariable Long unitaId) {
+        return ResponseEntity.ok(unitaOrganizzativaService.getDipendentiNonAssegnati(unitaId));
+    }
     @PostMapping("/dipendenti/create-with-roles-and-unit")
     public ResponseEntity<Dipendente> creaDipendenteConRuoliEUnita(@RequestBody DipendenteDTO dipendenteDTO) {
         Dipendente dipendente = unitaOrganizzativaService.creaDipendenteConRuoliEUnita(dipendenteDTO);

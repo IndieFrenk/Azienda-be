@@ -10,8 +10,9 @@ import com.MultiModule.Entity.Dipendente;
 import com.MultiModule.Entity.Ruolo;
 import com.MultiModule.Entity.UnitaOrganizzativa;
 import com.MultiModule.Utility.GestioneRuoloStrategy;
-import com.MultiModule.Utility.RuoloFactory;
+import org.elasticsearch.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -41,8 +42,11 @@ public class UnitaOrganizzativaService {
         for (String i : ruoli ) { ruoloList.add(ruoloDAO.findByNome(i));}
         unitaOrganizzativa.setRuoli(ruoloList);
 
-        Optional<UnitaOrganizzativa> unitaSuperiore = unitaOrganizzativaRepository.findById(Long.valueOf(unitaOrganizzativaDTO.getUnitaSuperiore()));
-        unitaOrganizzativa.setUnitaSuperiore(unitaSuperiore.get());
+        if (unitaOrganizzativaDTO.getUnitaSuperiore() != null) {
+            Optional<UnitaOrganizzativa> unitaSuperiore = unitaOrganizzativaRepository.findById(Long.valueOf(unitaOrganizzativaDTO.getUnitaSuperiore()));
+            unitaOrganizzativa.setUnitaSuperiore(unitaSuperiore.get());
+        }
+
         List<String> unita =  unitaOrganizzativaDTO.getUnitaSottostanti();
         List<UnitaOrganizzativa> unitaList =  new ArrayList<>();
         for (String i : unita ) { unitaList.add(unitaOrganizzativaRepository.findByNome(i));}
@@ -112,14 +116,37 @@ public class UnitaOrganizzativaService {
         return dipendenteList;
     }
 
-    public void deleteUnitaOrganizzativa(Long id) {
-        unitaOrganizzativaRepository.deleteById(id);
+    public ResponseEntity<Object> deleteUnitaOrganizzativa(Long id) {
+        UnitaOrganizzativa unitaOrganizzativa = unitaOrganizzativaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Unità organizzativa non trovata"));
+
+        List<Ruolo> ruoli = unitaOrganizzativa.getRuoli();
+        for (Ruolo ruolo : ruoli) {
+            ruolo.getUnitaOrganizzative().remove(unitaOrganizzativa);
+            ruoloDAO.save(ruolo);
+        }
+        unitaOrganizzativa.getRuoli().clear();
+        unitaOrganizzativaRepository.save(unitaOrganizzativa);
+
+        // 2. Rimuovi tutti i dipendenti associati all'unità organizzativa
+        List<Dipendente> dipendenti = unitaOrganizzativa.getDipendenti();
+        for (Dipendente dipendente : dipendenti) {
+            dipendente.getUnitaOrganizzative().remove(unitaOrganizzativa);
+            dipendenteDAO.save(dipendente);
+        }
+        unitaOrganizzativa.getDipendenti().clear();
+        unitaOrganizzativaRepository.save(unitaOrganizzativa);
+
+        // 3. Elimina l'unità organizzativa
+        unitaOrganizzativaRepository.delete(unitaOrganizzativa);
+
+        return ResponseEntity.noContent().build();
     }
 
     public Ruolo createRuoloPerUnita(String tipoRuolo, UnitaOrganizzativa unitaOrganizzativa) {
         Ruolo ruolo = new Ruolo();
         ruolo.setNome(tipoRuolo);
-        List<UnitaOrganizzativa> unita= new ArrayList<>();
+        Set<UnitaOrganizzativa> unita= new HashSet<>();
         unita.add(unitaOrganizzativa);
 
         ruolo.setUnitaOrganizzative(unita);
@@ -221,7 +248,7 @@ public class UnitaOrganizzativaService {
                 ruolo.get().getUnitaOrganizzative().add(unita);
                 return ruoloDAO.save(ruolo.get());
             }
-            List<UnitaOrganizzativa> listUnita = new ArrayList<>();
+            Set<UnitaOrganizzativa> listUnita = new HashSet<>();
             listUnita.add(unita);
             Ruolo nuovoRuolo = new Ruolo(nomeRuolo, listUnita);  // Crea il nuovo ruolo connesso all'unità organizzativa
             return ruoloDAO.save(nuovoRuolo);  // Salva il ruolo nel repository
@@ -256,6 +283,7 @@ public class UnitaOrganizzativaService {
         }
     }
     public Dipendente creaDipendenteConRuoliEUnita(DipendenteDTO dipendenteDTO) {
+
         List<Long> ruoliIds = dipendenteDTO.getRuoli();
         Long unitaId = dipendenteDTO.getUnita();
         System.out.println(dipendenteDTO.getUnita());
@@ -265,15 +293,20 @@ public class UnitaOrganizzativaService {
             ruoli = ruoloDAO.findAllById(ruoliIds);
         }
 
-        UnitaOrganizzativa unita = null;
+        UnitaOrganizzativa unita = new UnitaOrganizzativa();
         if (unitaId != null) {
-            Optional<UnitaOrganizzativa> unitaOpt = unitaOrganizzativaRepository.findById(unitaId);
-            unita = unitaOpt.orElse(null);
-        }
+            unita = unitaOrganizzativaRepository.findById(unitaId).get();
 
-        // Creare e inizializzare il dipendente con i dati dal DTO
+        }
         Dipendente dipendente = new Dipendente();
-        dipendente.setNome(dipendenteDTO.getNome());
+
+        if (dipendenteDAO.findByNome(dipendenteDTO.getNome()) == null || dipendenteDTO.getId() == null) {
+
+            dipendente.setNome(dipendenteDTO.getNome());
+        }
+        else{
+        dipendente = dipendenteDAO.findById(dipendenteDTO.getId()).get();}
+
         dipendente.setRuoli(new ArrayList<>());
         dipendente.setUnitaOrganizzative(new ArrayList<>());
 
@@ -404,6 +437,16 @@ public class UnitaOrganizzativaService {
 
     public List<Ruolo> getRuoli() {
         return ruoloDAO.findAll();
+    }
+
+    public List<Dipendente> getDipendentiNonAssegnati(Long unitaId) {
+        List<Dipendente> listaTot = dipendenteDAO.findAll();
+        listaTot.removeIf(i -> i.getUnitaOrganizzative().contains(unitaOrganizzativaRepository.findById(unitaId).get()));
+        return listaTot;
+    }
+
+    public List<Dipendente> getAllDipendenti() {
+        return dipendenteDAO.findAll();
     }
 
     /*public Dipendente creaDipendente(DipendenteDTO dipendente) {

@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -22,13 +24,13 @@ public class Ruolo {
             joinColumns = @JoinColumn(name = "ruolo_id"),
             inverseJoinColumns = @JoinColumn(name = "unita_organizzativa_id")
     )
-    private List<UnitaOrganizzativa> unitaOrganizzative;
+    private Set<UnitaOrganizzativa> unitaOrganizzative = new HashSet<>();
 
     // Relazione molti-a-molti con Dipendente
     @ManyToMany(mappedBy = "ruoli")
     private List<Dipendente> dipendenti;
 
-    public Ruolo(String nome, List<UnitaOrganizzativa> unitaOrganizzativa) {
+    public Ruolo(String nome, Set<UnitaOrganizzativa> unitaOrganizzativa) {
         this.nome = nome;
         this.unitaOrganizzative = unitaOrganizzativa;
     }
