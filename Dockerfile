@@ -1,4 +1,4 @@
-FROM openjdk:22-jdk-slim
+FROM maven:3.9.4-openjdk-22-slim AS build
 
 WORKDIR /app
 
@@ -8,15 +8,17 @@ COPY Authentication/pom.xml Authentication/
 COPY Configuration/pom.xml Configuration/
 COPY Feedback/pom.xml Feedback/
 
-COPY mvnw .
-COPY .mvn .mvn
-RUN chmod +x mvnw
-
-RUN ./mvnw dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 
 COPY . .
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
+
+FROM openjdk:22-jdk-slim
+
+WORKDIR /app
+
+COPY --from=build /app/AppMain/target/AppMain-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "AppMain/target/AppMain-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "app.jar"]
