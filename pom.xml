@@ -126,6 +126,11 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>me.paulschwarz</groupId>
+			<artifactId>spring-dotenv</artifactId>
+			<version>4.0.0</version>
+		</dependency>
 	</dependencies>
 	<modules>
 		<module>Configuration</module>
@@ -142,7 +147,6 @@
 					<version>3.14.0</version>
 					<configuration>
 
-						<mainClass>com.MultiModule.Authentication.AuthApplication</mainClass>
 
 						<source>${java.version}</source>
 						<target>${java.version}</target>
