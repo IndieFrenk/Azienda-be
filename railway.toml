@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+buildCommand = "./mvnw clean package -DskipTests -q"
+
+[deploy]
+startCommand = "java -jar AppMain/target/AppMain-0.0.1-SNAPSHOT.jar"
+healthcheckPath = "/actuator/health"
+healthcheckTimeout = 300
