@@ -8,6 +8,7 @@ Gestione feedback
 Configurazioni di sicurezza
 Templates email per reset password e nuove risposte
 
+
 ## Configurazione
 Le configurazioni sono centralizzate in application.properties nel modulo AppMain.
 
